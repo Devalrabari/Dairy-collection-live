@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
-
+const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -17,6 +17,9 @@ const mongoURI = process.env.MONGO_URI || "mongodb+srv://devalrabari7998_db_user
 mongoose.connect(mongoURI)
     .then(() => console.log("✓ MongoDB Atlas સાથે કનેક્શન થઈ ગયું છે!"))
     .catch((err) => console.error("MongoDB કનેક્શનમાં ભૂલ આવી:", err));
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
 // ---- Mongoose Schemas & Models ----
 
