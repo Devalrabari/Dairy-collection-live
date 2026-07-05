@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ડેરી દૂધ કલેક્શન સિસ્ટમ</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f7f6; color: #333; padding: 20px; }
+        header { background-color: #1e3d59; color: white; text-align: center; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 850px; margin-left: auto; margin-right: auto; }
+        h2 { color: #1e3d59; margin-bottom: 15px; border-bottom: 2px solid #ffc107; padding-bottom: 5px; }
+        .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 10px; }
+        .form-group { flex: 1; min-width: 180px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        input[readonly] { background-color: #eee; cursor: not-allowed; }
+        button { background-color: #17b978; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #139a63; }
+        .btn-blue { background-color: #1e3d59; }
+        .btn-blue:hover { background-color: #122538; }
+        .btn-orange { background-color: #ff9f43; }
+        .btn-orange:hover { background-color: #ee5a24; }
+        .btn-print { background-color: #00bcd4; color: white; font-size: 18px; padding: 15px; margin-top: 15px; }
+        .btn-print:hover { background-color: #0097a7; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: #1e3d59; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .total-box { background-color: #e8f4f8; padding: 15px; border-radius: 4px; margin-top: 20px; font-weight: bold; border: 2px dashed #1e3d59; }
+        .status-msg { color: #17b978; font-weight: bold; margin-top: 5px; display: block; }
+        
+        @media print {
+            body { background-color: white; padding: 0; }
+            header, .box:not(#printArea), button, #btnClearAll, #searchForm, p { display: none !important; }
+            #printArea { display: block !important; width: 100% !important; max-width: 100% !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }
+            table { width: 100% !important; border: 1px solid #000 !important; }
+            th, td { border: 1px solid #000 !important; padding: 8px !important; color: #000 !important; }
+            th { background-color: #eee !important; color: #000 !important; }
+            .total-box { border: 2px solid #000 !important; background-color: #fff !important; margin-top: 30px !important; font-size: 18px !important; }
+            .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #000; padding-bottom: 10px; }
+        }
+        .print-header { display: none; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🥛 મારી DD ડેરી દૂધ કલેક્શન સિસ્ટમ</h1>
+        <p>ઓટોમેટીક ક્લાઉડ સ્ટોરેજ અને એડવાન્સ રિપોર્ટ સિસ્ટમ</p>
+    </header>
+
+    <!-- વિભાગ ૧ -->
+    <div class="box">
+        <h2>👤 ૧. નવો ગ્રાહક રજીસ્ટ્રેશન</h2>
+        <form id="customerForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ગ્રાહક નંબર (ID):</label>
+                    <input type="number" id="regId" required placeholder="દા.ત. 1">
+                </div>
+                <div class="form-group">
+                    <label>ગ્રાહકનું નામ:</label>
+                    <input type="text" id="regName" required placeholder="દા.ત. રમેશભાઈ પટેલ">
+                </div>
+            </div>
+            <button type="submit" class="btn-blue">ગ્રાહક લિસ્ટમાં ઉમેરો</button>
+        </form>
+        <span id="regStatus" class="status-msg" style="color: #1e3d59;"></span>
+    </div>
+
+    <!-- વિભાગ ૨ -->
+    <div class="box">
+        <h2>📝 ૨. રોજિંદી દૂધ એન્ટ્રી કરો</h2>
+        <form id="milkForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>તારીખ પસંદ કરો:</label>
+                    <input type="date" id="entryDate" required>
+                </div>
+                <div class="form-group"></div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ગ્રાહક નંબર (ID) લખો:</label>
+                    <input type="number" id="chkId" required placeholder="નંબર લખતા જ નામ નીચે આવશે...">
+                </div>
+                <div class="form-group">
+                    <label>ગ્રાહકનું નામ:</label>
+                    <input type="text" id="dispName" readonly placeholder="નામ આપોઆપ આવશે">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>સમય (શિફ્ટ):</label>
+                    <select id="shift">
+                        <option value="સવાર">સવાર (Morning)</option>
+                        <option value="સાંજ">સાંજ (Evening)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>દૂધનો પ્રકાર:</label>
+                    <select id="milkType">
+                        <option value="ગાય">ગાયનું દૂધ</option>
+                        <option value="ભેંસ">ભેંસનું દૂધ</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>કુલ લીટર:</label>
+                    <input type="number" id="liters" min="0.01" step="0.01" required placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label>કુલ ફેટ (Fat):</label>
+                    <input type="number" id="fat" min="0.1" step="0.1" required placeholder="0.0">
+                </div>
+                <div class="form-group">
+                    <label>ભાવ (પ્રતિ ફેટ):</label>
+                    <input type="number" id="rate" min="0.01" step="0.01" required placeholder="દા.ત. 8.50">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>કુલ રકમ (રૂપિયા):</label>
+                    <input type="text" id="calcTotal" readonly style="background-color: #eef9f5; font-weight: bold; color: green;" placeholder="ઓટોમેટીક ગુણાકાર થશે">
+                </div>
+            </div>
+
+            <button type="submit">એન્ટ્રી સેવ કરો</button>
+        </form>
+    </div>
+
+    <!-- વિભાગ ૩ -->
+    <div class="box" style="background-color: #fff3cd;">
+        <h2>🔍 ૩. ચોક્કસ સમયગાળાનો રેકોર્ડ જુઓ (Date Range Search)</h2>
+        <form id="searchForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ક્યારથી (From Date):</label>
+                    <input type="date" id="fromDate">
+                </div>
+                <div class="form-group">
+                    <label>ક્યાં સુધી (To Date):</label>
+                    <input type="date" id="toDate">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>ગ્રાહક નંબર (ID) લખો (વૈકલ્પિક):</label>
+                    <input type="number" id="filterId" placeholder="કોઈ એક જ ગ્રાહકનો જોવો હોય તો જ નંબર લખવો...">
+                </div>
+            </div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 10px;">* જો આખા ગામનો રિપોર્ટ જોવો હોય તો ગ્રાહક નંબર ખાલી રાખીને માત્ર બે તારીખ નાખી સર્ચ કરવું.</p>
+            <div class="form-row">
+                <div class="form-group">
+                    <button type="submit" class="btn-orange">રેકોર્ડ શોધો (Filter)</button>
+                </div>
+                <div class="form-group">
+                    <button type="button" id="btnShowAll" class="btn-blue">બધો જ ડેટા પાછો બતાવો</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- વિભાગ ૪ -->
+    <div class="box" id="printArea">
+        <div class="print-header">
+            <h1>🥛 મારી ડેરી દૂધ કલેક્શન બિલ</h1>
+            <p style="display:block; margin-top:5px; font-size:14px;" id="billDateRange">દૂધનો હિસાબ રિપોર્ટ</p>
+        </div>
+
+        <h2>📊 કલેક્શન લિસ્ટ રિપોર્ટ</h2>
+        <div id="searchTitle" style="margin-top: 5px; margin-bottom: 10px; font-weight: bold; color: #1e3d59;"></div>
+        
+        <div style="overflow-x: auto;">
+            <table id="mainTable">
+                <thead>
+                    <tr>
+                        <th>તારીખ</th>
+                        <th>આઈડી</th>
+                        <th>નામ</th>
+                        <th>સમય</th>
+                        <th>પ્રકાર</th>
+                        <th>લીટર</th>
+                        <th>ફેટ</th>
+                        <th>ભાવ</th>
+                        <th>કુલ રકમ</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div class="total-box">
+            <p style="font-size: 16px; margin-bottom: 5px; display:block;">📊 કુલ દૂધ કલેક્શન: <span id="finalLiters" style="font-size: 18px; color: #1e3d59;">0.00</span> લીટર</p>
+            <p style="font-size: 20px; color: #d32f2f; display:block;">💰 કુલ ચુકવવાપાત્ર રકમ (બિલ ટોટલ): ₹ <span id="finalCash" style="font-size: 24px; font-weight: bold;">0.00</span></p>
+        </div>
+        
+        <button type="button" id="btnPrint" class="btn-print">🖨️ આ બિલ પ્રિન્ટ કરો / PDF બનાવો</button>
+        <button type="button" id="btnClearAll" style="background-color: #ff4757; margin-top: 15px;">બધો ડેટા સાફ કરો</button>
+    </div>
+
+<script>
+    var globalCustomers = {};
+    var milkRecords = []; 
+    
+    // ⚠️ જ્યારે Render પર સર્વર લાઈવ કરો ત્યારે આ URL ને તમારા Render ના બેકએન્ડ URL સાથે બદલી નાખજો.
+    const BACKEND_URL = "http://localhost:3000/api"; 
+
+    // પેજ લોડ થતાં જ ડેટાબેઝમાંથી જૂનો ડેટા લાવવો
+    window.onload = function() {
+        var today = new Date().toISOString().split('T')[0];
+        document.getElementById('entryDate').value = today;
+
+        fetch(`${BACKEND_URL}/data`)
+            .then(res => res.json())
+            .then(data => {
+                globalCustomers = data.customers || {};
+                milkRecords = data.records || [];
+                updateTable(milkRecords);
+            })
+            .catch(err => console.error("ડેટા લોડ કરવામાં મુશ્કેલી:", err));
+    };
+
+    // ૧. ગ્રાહક રજીસ્ટ્રેશન
+    document.getElementById("customerForm").addEventListener("submit", function(e) {
+        e.preventDefault(); 
+        var id = Number(document.getElementById("regId").value.trim());
+        var name = document.getElementById("regName").value.trim();
+        
+        fetch(`${BACKEND_URL}/customers`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, name })
+        })
+        .then(res => res.json())
+        .then(data => {
+            globalCustomers = data.customers;
+            document.getElementById("regStatus").innerText = "✓ ગ્રાહક ક્લાઉડ પર સેવ થયો: નંબર " + id + " - " + name;
+            document.getElementById("customerForm").reset();
+            setTimeout(() => document.getElementById("regStatus").innerText = "", 3000); 
+        });
+    });
+
+    // ૨. લાઈવ નામ ચેક કરવું
+    document.getElementById("chkId").addEventListener("input", function() {
+        var inputId = Number(this.value.trim());
+        var disp = document.getElementById("dispName");
+        if (this.value.trim() === "") { disp.value = ""; return; }
+        
+        if (globalCustomers[inputId]) {
+            disp.value = globalCustomers[inputId];
+        } else {
+            disp.value = "ગ્રાહક મળ્યો નથી!";
+        }
+    });
+
+    // ૩. લાઈવ ગણતરી
+    var calcFields = ["liters", "fat", "rate"];
+    calcFields.forEach(function(fieldId) {
+        document.getElementById(fieldId).addEventListener("input", function() {
+            var l = parseFloat(document.getElementById("liters").value) || 0;
+            var f = parseFloat(document.getElementById("fat").value) || 0;
+            var r = parseFloat(document.getElementById("rate").value) || 0;
+            var total = l * f * r;
+            document.getElementById("calcTotal").value = total.toFixed(2);
+        });
+    });
+
+    // ૪. દૂધની એન્ટ્રી ક્લાઉડમાં સેવ કરવી
+    document.getElementById("milkForm").addEventListener("submit", function(e) {
+        e.preventDefault(); 
+        
+        var rawDate = document.getElementById("entryDate").value;
+        var dateParts = rawDate.split("-");
+        var displayDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];
+
+        var id = Number(document.getElementById("chkId").value.trim());
+        var name = document.getElementById("dispName").value;
+        var shift = document.getElementById("shift").value;
+        var milkType = document.getElementById("milkType").value;
+        var l = parseFloat(document.getElementById("liters").value) || 0;
+        var f = parseFloat(document.getElementById("fat").value) || 0;
+        var r = parseFloat(document.getElementById("rate").value) || 0;
+        var total = parseFloat(document.getElementById("calcTotal").value) || 0;
+
+        if(name === "ગ્રાહક મળ્યો નથી!" || name === "") {
+            alert("કૃપા કરીને સાચો ગ્રાહક નંબર નાખો અથવા પહેલા ગ્રાહક રજીસ્ટર કરો.");
+            return;
+        }
+
+        var newEntry = {
+            rawDate: rawDate, date: displayDate, id: id, name: name,
+            shift: shift, milkType: milkType, liters: l, fat: f, rate: r, totalAmt: total
+        };
+
+        fetch(`${BACKEND_URL}/records`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newEntry)
+        })
+        .then(res => res.json())
+        .then(data => {
+            milkRecords = data.records;
+            updateTable(milkRecords);
+
+            document.getElementById("chkId").value = "";
+            document.getElementById("dispName").value = "";
+            document.getElementById("liters").value = "";
+            document.getElementById("fat").value = "";
+            document.getElementById("calcTotal").value = "";
+            document.getElementById("chkId").focus();
+        });
+    });
+
+    // ૫. ટેબલ અપડેટ કરવું
+    function updateTable(dataArray) {
+        var tbody = document.querySelector("#mainTable tbody");
+        tbody.innerHTML = ""; 
+        var totalL = 0; var totalC = 0;
+
+        dataArray.forEach(function(record) {
+            var tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td><strong>${record.date}</strong></td>
+                <td>${record.id}</td>
+                <td>${record.name}</td>
+                <td><strong style="color:${record.shift === 'સવાર' ? '#f39c12' : '#2980b9'}">${record.shift}</strong></td>
+                <td>${record.milkType}</td>
+                <td>${record.liters.toFixed(2)}</td>
+                <td>${record.fat.toFixed(1)}</td>
+                <td>${record.rate.toFixed(2)}</td>
+                <td style="font-weight:bold; color:green;">₹${record.totalAmt.toFixed(2)}</td>
+            `;
+            tbody.appendChild(tr);
+            totalL += record.liters;
+            totalC += record.totalAmt;
+        });
+
+        document.getElementById("finalLiters").innerText = totalL.toFixed(2);
+        document.getElementById("finalCash").innerText = totalC.toFixed(2);
+    }
+
+    // ૬. ડેટ રેન્જ ફિલ્ટર
+    document.getElementById("searchForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        var fromDate = document.getElementById("fromDate").value;
+        var toDate = document.getElementById("toDate").value;
+        var filterId = document.getElementById("filterId").value.trim();
+        
+        var filteredData = milkRecords.filter(function(record) {
+            var matchDate = true; var matchId = true;
+            if(fromDate !== "") { matchDate = matchDate && (record.rawDate >= fromDate); }
+            if(toDate !== "") { matchDate = matchDate && (record.rawDate <= toDate); }
+            if(filterId !== "") { matchId = (record.id === Number(filterId)); }
+            return matchDate && matchId;
+        });
+
+        var msg = "🔍 રિપોર્ટ: "; var pRange = "દૂધનો હિસાબ રિપોર્ટ";
+        if(fromDate !== "" && toDate !== "") {
+            var fPrint = fromDate.split('-').reverse().join('-');
+            var tPrint = toDate.split('-').reverse().join('-');
+            msg += `તારીખ ${fPrint} થી ${tPrint} સુધીનો `;
+            pRange = `તારીખ ગાળો: ${fPrint} થી ${tPrint}`;
+        }
+        if(filterId !== "") {
+            var cName = globalCustomers[filterId] ? globalCustomers[filterId] : "અજાણ્યો ગ્રાહક";
+            msg += `ગ્રાહક નં [${filterId} - ${cName}] નો ડેટા`;
+            pRange += ` | ગ્રાહક: ${filterId} - ${cName}`;
+        } else {
+            msg += `આખા ગામનો ડેટા`; pRange += ` | આખા ગામનો સામૂહિક રિપોર્ટ`;
+        }
+        
+        document.getElementById("searchTitle").innerText = msg;
+        document.getElementById("billDateRange").innerText = pRange;
+        updateTable(filteredData);
+    });
+
+    document.getElementById("btnShowAll").addEventListener("click", function() {
+        document.getElementById("filterId").value = "";
+        document.getElementById("fromDate").value = "";
+        document.getElementById("toDate").value = "";
+        document.getElementById("searchTitle").innerText = "";
+        document.getElementById("billDateRange").innerText = "દૂધનો હિસાબ રિપોર્ટ";
+        updateTable(milkRecords); 
+    });
+
+    document.getElementById("btnPrint").addEventListener("click", function() { window.print(); });
+
+    // ૭. ડેટા તમારી મરજીથી જ સાફ થશે
+    document.getElementById("btnClearAll").addEventListener("click", function() {
+        if(confirm("શું તમે ખરેખર બધો ડેટા ડીલીટ કરવા માંગો છો? આનાથી ક્લાઉડ પરથી બધો જ ડેટા ભૂસાઈ જશે!")) {
+            fetch(`${BACKEND_URL}/clear`, { method: 'POST' })
+            .then(res => res.json())
+            .then(() => {
+                milkRecords = [];
+                updateTable(milkRecords);
+                document.getElementById("searchTitle").innerText = "";
+                alert("ડેટાબેઝમાંથી બધો ડેટા સાફ થઈ ગયો છે.");
+            });
+        }
+    });
+</script>
+</body>
+                      </html>
+
