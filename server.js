@@ -112,4 +112,3 @@ app.post('/api/clear', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`સર્વર પોર્ટ ${PORT} પર ચાલુ છે.`);
 });
-
