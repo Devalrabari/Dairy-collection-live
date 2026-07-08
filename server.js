@@ -88,6 +88,44 @@ app.post('/api/customers', async (req, res) => {
     }
 });
 
+// API: ગ્રાહકને ડિલીટ કરવા માટે
+app.delete('/api/customers/:id', async (req, res) => {
+    try {
+        const customerId = req.params.id;
+        const deletedCustomer = await Customer.findOneAndDelete({ id: Number(customerId) });
+
+        if (!deletedCustomer) {
+            return res.status(404).json({ success: false, message: "ગ્રાહક મળ્યો નથી!" });
+        }
+
+        res.json({ success: true, message: "ગ્રાહક સફળતાપૂર્વક ડિલીટ થઈ ગયો છે." });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// API: ગ્રાહકનું નામ અપડેટ કરવા માટે
+app.put('/api/customers/:id', async (req, res) => {
+    try {
+        const customerId = req.params.id;
+        const { name } = req.body;
+        
+        const updatedCustomer = await Customer.findOneAndUpdate(
+            { id: Number(customerId) },
+            { name },
+            { new: true }
+        );
+
+        if (!updatedCustomer) {
+            return res.status(404).json({ success: false, message: "ગ્રાહક મળ્યો નથી!" });
+        }
+
+        res.json({ success: true, message: "ગ્રાહકનું નામ સફળતાપૂર્વક અપડેટ થઈ ગયું છે." });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // API: દૂધની નવી એન્ટ્રી સેવ કરવા માટે
 app.post('/api/records', async (req, res) => {
     try {
