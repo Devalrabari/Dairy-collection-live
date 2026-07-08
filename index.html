@@ -45,7 +45,7 @@
 </head>  
 <body>  
     <header>  
-        <h1>🥛 મારી ડેરી દૂધ કલેક્શન સિસ્ટમ</h1>  
+        <h1>🥛 મારી DD ડેરી દૂધ કલેક્શન સિસ્ટમ</h1>  
         <p>ઓટોમેટીક ક્લાઉડ સ્ટોરેજ અને એડવાન્સ રિપોર્ટ સિસ્ટમ</p>  
     </header>  
 
@@ -118,8 +118,8 @@
                     <input type="number" id="fat" min="0.1" step="0.1" required placeholder="0.0">  
                 </div>  
                 <div class="form-group">  
-                    <label>ભાવ (પ્રતિ ફેટ):</label>  
-                    <input type="number" id="rate" min="0.01" step="0.01" required placeholder="દા.ત. 8.50">  
+                    <label>ભાવ (પ્રતિ લીટર):</label>  
+                    <input type="number" id="rate" min="0.01" step="0.01" required placeholder="દા.ત. 60.00">  
                 </div>  
             </div>  
 
@@ -257,27 +257,26 @@
             });  
         });  
       
-        // ૨. લાઈવ નામ ચેક કરવું  
+        // ૨. લાઈવ નામ ચેક કરવું (ભૂલ સુધારેલ - String માં ફેરવીને ચેક કર્યું)
         document.getElementById("chkId").addEventListener("input", function() {  
-            var inputId = Number(this.value.trim());  
+            var inputId = this.value.trim();  
             var disp = document.getElementById("dispName");  
-            if (this.value.trim() === "") { disp.value = ""; return; }  
+            if (inputId === "") { disp.value = ""; return; }  
               
-            if (globalCustomers[inputId]) {  
-                disp.value = globalCustomers[inputId];  
+            if (globalCustomers[inputId] || globalCustomers[Number(inputId)]) {  
+                disp.value = globalCustomers[inputId] || globalCustomers[Number(inputId)];  
             } else {  
                 disp.value = "ગ્રાહક મળ્યો નથી!";  
             }  
         });  
       
-        // ૩. લાઈવ ગણતરી  
+        // ૩. લાઈવ સાચી ગણતરી (લીટર * ભાવ)
         var calcFields = ["liters", "fat", "rate"];  
         calcFields.forEach(function(fieldId) {  
             document.getElementById(fieldId).addEventListener("input", function() {  
                 var l = parseFloat(document.getElementById("liters").value) || 0;  
-                var f = parseFloat(document.getElementById("fat").value) || 0;  
                 var r = parseFloat(document.getElementById("rate").value) || 0;  
-                var total = l * f * r;  
+                var total = l * r;  
                 document.getElementById("calcTotal").value = total.toFixed(2);  
             });  
         });  
@@ -349,14 +348,14 @@
                     <td>${record.name}</td>  
                     <td><strong style="color:${record.shift === 'સવાર' ? '#f39c12' : '#2980b9'}">${record.shift}</strong></td>  
                     <td>${record.milkType}</td>  
-                    <td>${record.liters.toFixed(2)}</td>  
-                    <td>${record.fat.toFixed(1)}</td>  
-                    <td>${record.rate.toFixed(2)}</td>  
-                    <td style="font-weight:bold; color:green;">₹${record.totalAmt.toFixed(2)}</td>  
+                    <td>${record.liters ? record.liters.toFixed(2) : '0.00'}</td>  
+                    <td>${record.fat ? record.fat.toFixed(1) : '0.0'}</td>  
+                    <td>${record.rate ? record.rate.toFixed(2) : '0.00'}</td>  
+                    <td style="font-weight:bold; color:green;">₹${record.totalAmt ? record.totalAmt.toFixed(2) : '0.00'}</td>  
                 `;  
                 tbody.appendChild(tr);  
-                totalL += record.liters;  
-                totalC += record.totalAmt;  
+                totalL += (record.liters || 0);  
+                totalC += (record.totalAmt || 0);  
             });  
       
             document.getElementById("finalLiters").innerText = totalL.toFixed(2);  
@@ -374,7 +373,7 @@
                 var matchDate = true; var matchId = true;  
                 if(fromDate !== "") { matchDate = matchDate && (record.rawDate >= fromDate); }  
                 if(toDate !== "") { matchDate = matchDate && (record.rawDate <= toDate); }  
-                if(filterId !== "") { matchId = (record.id === Number(filterId)); }  
+                if(filterId !== "") { matchId = (Number(record.id) === Number(filterId)); }  
                 return matchDate && matchId;  
             });  
       
@@ -386,7 +385,7 @@
                 pRange = `તારીખ ગાળો: ${fPrint} થી ${tPrint}`;  
             }  
             if(filterId !== "") {  
-                var cName = globalCustomers[filterId] ? globalCustomers[filterId] : "અજાણ્યો ગ્રાહક";  
+                var cName = globalCustomers[filterId] || globalCustomers[Number(filterId)] || "અજાણ્યો ગ્રાહક";  
                 msg += `ગ્રાહક નં [${filterId} - ${cName}] નો ડેટા`;  
                 pRange += ` | ગ્રાહક: ${filterId} - ${cName}`;  
             } else {  
@@ -399,7 +398,4 @@
         });  
       
         // ૭. શો ઓલ (બધો જ ડેટા પાછો બતાવો)
-        document.getElementById("btnShowAll").addEventListener("click", function() {  
-            document.getElementById("filterId").value = "";
-            document.getElementById("fromDate").value = "";
-            document.getElemen
+        document.getElementById("btnShowAll").addEventListener("click", functi
