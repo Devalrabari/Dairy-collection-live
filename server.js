@@ -20,6 +20,9 @@ mongoose.connect(mongoURI)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+app.get('/admin.html', (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+});
 
 // ---- Mongoose Schemas & Models ----
 
