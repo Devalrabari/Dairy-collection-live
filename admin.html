@@ -117,6 +117,51 @@
                 })  
                 .catch(err => alert("ભૂલ: " + err.message));
         }
+        // કસ્ટમર લિસ્ટ માટે ડિલીટ ફંક્શન
+function deleteCustomer(customerId) {
+    if (confirm("શું તમે આ કસ્ટમરને ડિલીટ કરવા માંગੋ છો?")) {
+        fetch(`${BACKEND_URL}/api/customers/${customerId}`, {
+            method: 'DELETE'
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("કસ્ટમર ડિલીટ થઈ શક્યો નથી.");
+            return res.json();
+        })
+        .then(data => {
+            alert(data.message);
+            // અહીં પેજને રિફ્રेश કરો અથવા લિસ્ટને અપડેટ કરો
+        })
+        .catch(err => {
+            alert("ભૂલ: " + err.message);
+        });
+    }
+}
+
+// કસ્ટમર લિસ્ટ માટે એડિટ ફંક્શન
+function editCustomer(customerId, currentName) {
+    const newName = prompt("કૃપા કરીને નવું નામ દાખલ કરો:", currentName);
+    if (newName) {
+        fetch(`${BACKEND_URL}/api/customers/${customerId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ name: newName })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("નામ અપડેટ થઈ શક્યું નથી.");
+            return res.json();
+        })
+        .then(data => {
+            alert(data.message);
+            // અહીં પેજને રિફ્રेश કરો અથવા લિસ્ટને અપડેટ કરો
+        })
+        .catch(err => {
+            alert("ભૂલ: " + err.message);
+        });
+    }
+                }
+        
 
         // ટેબલ જનરેટ કરવું
         function updateAdminTable(dataArray) {
