@@ -3,7 +3,7 @@
 <head>  
     <meta charset="UTF-8">  
     <meta name="viewport" content="width=device-width, initial-scale=1.0">  
-    <title>ડેરી દૂધ કલેક્શન સિસ્ટમ</title>  
+    <title>デーリ દૂધ કલેક્શન સિસ્ટમ</title>  
     <style>  
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }  
         body { background-color: #f4f7f6; color: #333; padding: 20px; }  
@@ -29,10 +29,10 @@
         tr:nth-child(even) { background-color: #f9f9f9; }  
         .total-box { background-color: #e8f4f8; padding: 15px; border-radius: 4px; margin-top: 20px; font-weight: bold; border: 2px dashed #1e3d59; }  
         .status-msg { color: #17b978; font-weight: bold; margin-top: 5px; display: block; }  
-        
+          
         @media print {  
             body { background-color: white; padding: 0; }  
-            header, .box:not(#printArea), button, #btnClearAll, #searchForm, p { display: none !important; }  
+            header, .box:not(#printArea), button, #btnClearAll, #searchForm, p, .admin-link-box { display: none !important; }  
             #printArea { display: block !important; width: 100% !important; max-width: 100% !important; box-shadow: none !important; padding: 0 !important; margin: 0 !important; }  
             table { width: 100% !important; border: 1px solid #000 !important; }  
             th, td { border: 1px solid #000 !important; padding: 8px !important; color: #000 !important; }  
@@ -41,7 +41,7 @@
             .print-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 2px dashed #000; padding-bottom: 10px; }  
         }  
         .print-header { display: none; }  
-    </style>
+    </style>  
 </head>  
 <body>  
 
@@ -49,6 +49,10 @@
         <h1>🥛 મારી ડેરી દૂધ કલેક્શન સિસ્ટમ</h1>  
         <p>ઓટોમેટીક ક્લાઉડ સ્ટોરેજ અને એડવાન્સ રિપોર્ટ સિસ્ટમ</p>  
     </header>  
+
+    <div class="admin-link-box" style="text-align: right; max-width: 850px; margin: 0 auto 15px auto;">
+        <a href="admin.html" style="color: #d32f2f; font-weight: bold; text-decoration: none; background: #ffe3e3; padding: 8px 15px; border-radius: 5px; border: 1px solid #ffb4b4;">⚙️ એડમિન પેનલ (સુધારો/ડીલીટ) ➡️</a>
+    </div>
 
     <div class="box">  
         <h2>👤 ૧. નવો ગ્રાહક રજીસ્ટ્રેશન</h2>  
@@ -172,14 +176,13 @@
 
         <h2>📊 કલેક્શન લિસ્ટ રિપોર્ટ</h2>  
         <div id="searchTitle" style="margin-top: 5px; margin-bottom: 10px; font-weight: bold; color: #1e3d59;"></div>  
-          
+            
         <div style="overflow-x: auto;">  
             <table id="mainTable">  
                 <thead>  
                     <tr>  
                         <th>તારીખ</th>  
                         <th>આઈડી</th>  
-
                         <th>નામ</th>  
                         <th>સમય</th>  
                         <th>પ્રકાર</th>  
@@ -197,7 +200,7 @@
             <p style="font-size: 16px; margin-bottom: 5px; display:block;">📊 કુલ દૂધ કલેક્શન: <span id="finalLiters" style="font-size: 18px; color: #1e3d59;">0.00</span> લીટર</p>  
             <p style="font-size: 20px; color: #d32f2f; display:block;">💰 કુલ ચુકવવાપાત્ર રકમ (બિલ ટોટલ): ₹ <span id="finalCash" style="font-size: 24px; font-weight: bold;">0.00</span></p>  
         </div>  
-          
+            
         <button type="button" id="btnPrint" class="btn-print">🖨️ આ બિલ પ્રિન્ટ કરો / PDF બનાવો</button>  
         <button type="button" id="btnClearAll" style="background-color: #ff4757; margin-top: 15px;">બધો ડેટા સાફ કરો</button>  
     </div>  
@@ -205,71 +208,69 @@
     <script>  
         var globalCustomers = {};  
         var milkRecords = [];   
-          
+            
         const BACKEND_URL = "https://dairy-collection-live.onrender.com/api";   
-      
+        
         window.onload = function() {  
             var today = new Date().toISOString().split('T')[0];  
             document.getElementById('entryDate').value = today;  
-      
+        
             fetch(`${BACKEND_URL}/data`)  
-                .then(res => {
-                    if (!res.ok) throw new Error("સર્વરમાંથી ડેટા લોડ ન થઈ શક્યો.");
-                    return res.json();
+                .then(res => {  
+                    if (!res.ok) throw new Error("સર્વરમાંથી ડેટા લોડ ન થઈ શક્યો.");  
+                    return res.json();  
                 })  
                 .then(data => {  
                     globalCustomers = data.customers || {};  
                     milkRecords = data.records || [];  
                     updateTable(milkRecords);  
                 })  
-                .catch(err => {
-                    console.error("ડેટા લોડ કરવામાં મુશ્કેલી:", err);
-                    alert("ભૂલ: " + err.message);
+                .catch(err => {  
+                    console.error("ડેટા લોડ કરવામાં મુશ્કેલી:", err);  
+                    alert("ભૂલ: " + err.message);  
                 });  
         };  
-      
+        
         // ૧. ગ્રાહક રજીસ્ટ્રેશન  
         document.getElementById("customerForm").addEventListener("submit", function(e) {  
             e.preventDefault();   
             var id = Number(document.getElementById("regId").value.trim());  
             var name = document.getElementById("regName").value.trim();  
-              
+                
             fetch(`${BACKEND_URL}/customers`, {  
                 method: 'POST',  
                 headers: { 'Content-Type': 'application/json' },  
                 body: JSON.stringify({ id, name })  
             })  
-            .then(res => {
-                if (!res.ok) throw new Error("ગ્રાહક સેવ કરવામાં સર્વર એરર આવી.");
-                return res.json();
+            .then(res => {  
+                if (!res.ok) throw new Error("ગ્રાહક સેવ કરવામાં સર્વર એરર આવી.");  
+                return res.json();  
             })  
             .then(data => {  
                 globalCustomers = data.customers;  
                 document.getElementById("regStatus").innerText = "✓ ગ્રાહક ક્લાઉડ પર સેવ થયો: નંબર " + id + " - " + name;  
                 document.getElementById("customerForm").reset();  
                 setTimeout(() => document.getElementById("regStatus").innerText = "", 3000);   
-            })
-            .catch(err => {
-                console.error(err);
-                alert("ગ્રાહક રજીસ્ટ્રેશન નિષ્ફળ: " + err.message);
+            })  
+            .catch(err => {  
+                console.error(err);  
+                alert("ગ્રાહક રજીસ્ટ્રેશન નિષ્ફળ: " + err.message);  
             });  
         });  
-      
+        
         // ૨. લાઈવ નામ ચેક કરવું  
         document.getElementById("chkId").addEventListener("input", function() {  
             var inputId = Number(this.value.trim());  
             var disp = document.getElementById("dispName");  
             if (this.value.trim() === "") { disp.value = ""; return; }  
-              
+                
             if (globalCustomers[inputId]) {  
                 disp.value = globalCustomers[inputId];  
             } else {  
-
                 disp.value = "ગ્રાહક મળ્યો નથી!";  
-
             }  
         });  
-      
+        
         // ૩. લાઈવ ગણતરી  
         var calcFields = ["liters", "fat", "rate"];  
         calcFields.forEach(function(fieldId) {  
@@ -281,15 +282,15 @@
                 document.getElementById("calcTotal").value = total.toFixed(2);  
             });  
         });  
-      
+        
         // ૪. દૂધની એન્ટ્રી ક્લાઉડમાં સેવ કરવી  
         document.getElementById("milkForm").addEventListener("submit", function(e) {  
             e.preventDefault();   
-              
+                
             var rawDate = document.getElementById("entryDate").value;  
             var dateParts = rawDate.split("-");  
             var displayDate = dateParts[2] + "-" + dateParts[1] + "-" + dateParts[0];  
-      
+        
             var id = Number(document.getElementById("chkId").value.trim());  
             var name = document.getElementById("dispName").value;  
             var shift = document.getElementById("shift").value;  
@@ -298,50 +299,49 @@
             var f = parseFloat(document.getElementById("fat").value) || 0;  
             var r = parseFloat(document.getElementById("rate").value) || 0;  
             var total = parseFloat(document.getElementById("calcTotal").value) || 0;  
-      
+        
             if(name === "ગ્રાહક મળ્યો નથી!" || name === "") {  
                 alert("કૃપા કરીને સાચો ગ્રાહક નંબર નાખો અથવા પહેલા ગ્રાહક રજીસ્ટર કરો.");  
                 return;  
-
             }  
-      
+        
             var newEntry = {  
                 rawDate: rawDate, date: displayDate, id: id, name: name,  
                 shift: shift, milkType: milkType, liters: l, fat: f, rate: r, totalAmt: total  
             };  
-      
+        
             fetch(`${BACKEND_URL}/records`, {  
                 method: 'POST',  
                 headers: { 'Content-Type': 'application/json' },  
                 body: JSON.stringify(newEntry)  
             })  
-            .then(res => {
-                if (!res.ok) throw new Error("દૂધ એન્ટ્રી સેવ કરવામાં સર્વર એરર આવી.");
-                return res.json();
+            .then(res => {  
+                if (!res.ok) throw new Error("દૂધ એન્ટ્રી સેવ કરવામાં સર્વર એરર આવી.");  
+                return res.json();  
             })  
             .then(data => {  
                 milkRecords = data.records;  
                 updateTable(milkRecords);  
-      
+        
                 document.getElementById("chkId").value = "";  
                 document.getElementById("dispName").value = "";  
                 document.getElementById("liters").value = "";  
                 document.getElementById("fat").value = "";  
                 document.getElementById("calcTotal").value = "";  
                 document.getElementById("chkId").focus();  
-            })
-            .catch(err => {
-                console.error(err);
-                alert("એન્ટ્રી સેવ ન થઈ: " + err.message);
+            })  
+            .catch(err => {  
+                console.error(err);  
+                alert("એન્ટ્રી સેવ ન થઈ: " + err.message);  
             });  
         });  
-      
+        
         // ૫. ટેબલ અપડેટ કરવું  
         function updateTable(dataArray) {  
             var tbody = document.querySelector("#mainTable tbody");  
             tbody.innerHTML = "";   
             var totalL = 0; var totalC = 0;  
-      
+        
             dataArray.forEach(function(record) {  
                 var tr = document.createElement("tr");  
                 tr.innerHTML = `  
@@ -359,18 +359,18 @@
                 totalL += record.liters;  
                 totalC += record.totalAmt;  
             });  
-      
+        
             document.getElementById("finalLiters").innerText = totalL.toFixed(2);  
             document.getElementById("finalCash").innerText = totalC.toFixed(2);  
         }  
-      
+        
         // ૬. ડેટ રેન્જ ફિલ્ટર  
         document.getElementById("searchForm").addEventListener("submit", function(e) {  
             e.preventDefault();  
             var fromDate = document.getElementById("fromDate").value;  
             var toDate = document.getElementById("toDate").value;  
             var filterId = document.getElementById("filterId").value.trim();  
-              
+                
             var filteredData = milkRecords.filter(function(record) {  
                 var matchDate = true; var matchId = true;  
                 if(fromDate !== "") { matchDate = matchDate && (record.rawDate >= fromDate); }  
@@ -378,7 +378,7 @@
                 if(filterId !== "") { matchId = (record.id === Number(filterId)); }  
                 return matchDate && matchId;  
             });  
-      
+        
             var msg = "🔍 રિપોર્ટ: "; var pRange = "દૂધનો હિસાબ રિપોર્ટ";  
             if(fromDate !== "" && toDate !== "") {  
                 var fPrint = fromDate.split('-').reverse().join('-');  
@@ -393,35 +393,47 @@
             } else {  
                 msg += `આખા ગામનો ડેટા`; pRange += ` | આખા ગામનો સામૂહિક રિપોર્ટ`;  
             }  
-              
+                
             document.getElementById("searchTitle").innerText = msg;  
             document.getElementById("billDateRange").innerText = pRange;  
             updateTable(filteredData);  
         });  
-      
-        // ૭. શો ઓલ (બધો જ ડેટા પાછો બતાવો)
+        
+        // ૭. શો ઓલ (બધો જ ડેટા પાછો બતાવો)  
         document.getElementById("btnShowAll").addEventListener("click", function() {  
-            document.getElementById("filterId").value = "";
-            document.getElementById("fromDate").value = "";
-            document.getElementById("toDate").value = "";
-            document.getElementById("searchTitle").innerText = "";
-            document.getElementById("billDateRange").innerText = "દૂધનો હિસાબ રિપોર્ટ";
-            updateTable(milkRecords);
-        });
-
-        // ૮. પ્રિન્ટ બટન ફંક્શન
-        document.getElementById("btnPrint").addEventListener("click", function() {
-            window.print();
-        });
-
-        // ૯. ડેટા ક્લિયર કરવાનું ફંક્શન (વૈકલ્પિક લોકલ એલર્ટ સાથે)
-        document.getElementById("btnClearAll").addEventListener("click", function() {
-            if(confirm("શું તમે ખરેખર બધો ડેટા સાફ કરવા માંગો છો?")) {
-                milkRecords = [];
-                updateTable(milkRecords);
-                alert("સ્થાનિક વ્યુ સાફ કરવામાં આવ્યો છે.");
-            }
-        });
+            document.getElementById("filterId").value = "";  
+            document.getElementById("fromDate").value = "";  
+            document.getElementById("toDate").value = "";  
+            document.getElementById("searchTitle").innerText = "";  
+            document.getElementById("billDateRange").innerText = "દૂધનો હિસાબ રિપોર્ટ";  
+            updateTable(milkRecords);  
+        });  
+  
+        // ૮. પ્રિન્ટ બટન ફંક્શન  
+        document.getElementById("btnPrint").addEventListener("click", function() {  
+            window.print();  
+        });  
+  
+        // 🛠️ સુધારો ૯: MongoDB માંથી પણ ડેટા લાઈવ ક્લિયર કરવા માટે  
+        document.getElementById("btnClearAll").addEventListener("click", function() {  
+            if(confirm("⚠ ચેતવણી: શું તમે ખરેખર ડેટાબેઝમાંથી બધો જ દૂધનો રેકોર્ડ કાયમી ડિલીટ કરવા માંગો છો?")) {  
+                fetch(`${BACKEND_URL}/clear`, {  
+                    method: 'POST'  
+                })  
+                .then(res => {  
+                    if (!res.ok) throw new Error("સર્વર પરથી ડેટા સાફ ન થઈ શક્યો.");  
+                    return res.json();  
+                })  
+                .then(data => {  
+                    alert("🗑️ ડેટાબેઝમાંથી બધો રેકોર્ડ સાફ કરી દેવામાં આવ્યો છે.");  
+                    milkRecords = [];  
+                    updateTable(milkRecords);  
+                })  
+                .catch(err => {  
+                    alert("ભૂલ આવી: " + err.message);  
+                });  
+            }  
+        });  
     </script>  
 </body>  
 </html>
