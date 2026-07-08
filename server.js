@@ -13,10 +13,10 @@ app.use(express.json());
 // MongoDB Atlas કનેક્શન (Render પર MONGO_URI સેટ કરવો પડશે)
 const mongoURI = process.env.MONGO_URI || "mongodb+srv://devalrabari7998_db_user:I1457fmroeW6DZfR@cluster0.4rsrknt.mongodb.net/?appName=Cluster0";
 
-
 mongoose.connect(mongoURI)
     .then(() => console.log("✓ MongoDB Atlas સાથે કનેક્શન થઈ ગયું છે!"))
     .catch((err) => console.error("MongoDB કનેક્શનમાં ભૂલ આવી:", err));
+
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -93,6 +93,56 @@ app.post('/api/records', async (req, res) => {
         
         const recordsList = await MilkRecord.find({});
         res.json({ success: true, records: recordsList });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 🛠️ નવીનતમ ઉમેરો ૧: ચોક્કસ દૂધની એન્ટ્રી ડીલીટ કરવા માટે (DELETE API)
+app.delete('/api/records/:id', async (req, res) => {
+    try {
+        const recordId = req.params.id;
+        
+        // પ્રથમ ચેક કરીએ કે આઈડી મોંગોડીબીની _id છે કે કસ્ટમ id
+        let deleted;
+        if (mongoose.Types.ObjectId.isValid(recordId)) {
+            deleted = await MilkRecord.findByIdAndDelete(recordId);
+        } else {
+            deleted = await MilkRecord.findOneAndDelete({ id: Number(recordId) });
+        }
+
+        if (!deleted) {
+            return res.status(404).json({ success: false, message: "રેકોર્ડ મળ્યો નથી!" });
+        }
+
+        // ડીલીટ કર્યા પછી બાકી બચેલો બધો જ નવો ડેટા પાછો મોકલો
+        const recordsList = await MilkRecord.find({});
+        res.json({ success: true, message: "એન્ટ્રી સફળતાપૂર્વક ડીલીટ થઈ ગઈ છે.", records: recordsList });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// 🛠️ નવીનતમ ઉમેરો ૨: ચોક્કસ દૂધની એન્ટ્રી સુધારવા/એડિટ કરવા માટે (PUT API)
+app.put('/api/records/:id', async (req, res) => {
+    try {
+        const recordId = req.params.id;
+        const updatedData = req.body;
+
+        let updated;
+        if (mongoose.Types.ObjectId.isValid(recordId)) {
+            updated = await MilkRecord.findByIdAndUpdate(recordId, updatedData, { new: true });
+        } else {
+            updated = await MilkRecord.findOneAndUpdate({ id: Number(recordId) }, updatedData, { new: true });
+        }
+
+        if (!updated) {
+            return res.status(404).json({ success: false, message: "રેકોર્ડ મળ્યો નથી!" });
+        }
+
+        // અપડેટ કર્યા પછી નવો તાજો ડેટા મોકલો
+        const recordsList = await MilkRecord.find({});
+        res.json({ success: true, message: "એન્ટ્રી સફળતાપૂર્વક અપડેટ થઈ ગઈ છે.", records: recordsList });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
