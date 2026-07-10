@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>લોગીન - ડેરી કલેક્શન સિસ્ટમ</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        body { background-color: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; }
+        .login-box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { color: #1e3d59; text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; }
+        button { width: 100%; padding: 12px; background-color: #17b978; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { background-color: #139a63; }
+        .error-msg { color: #d32f2f; text-align: center; margin-top: 10px; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>લોગીન કરો</h2>
+    <form id="loginForm">
+        <div class="form-group">
+            <label>યુઝરનેમ:</label>
+            <input type="text" id="username" required placeholder="તમારું યુઝરનેમ નાખો">
+        </div>
+        <div class="form-group">
+            <label>પાસવર્ડ:</label>
+            <input type="password" id="password" required placeholder="તમારો પાસવર્ડ નાખો">
+        </div>
+        <button type="submit">લોગીન</button>
+        <p id="errorMsg" class="error-msg">ખોટો યુઝરનેમ અથવા પાસવર્ડ</p>
+    </form>
+</div>
+
+<script>
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        var user = document.getElementById("username").value;
+        var pass = document.getElementById("password").value;
+        
+        // અહીં તમે તમારી લોગીન લોજીક સેટ કરી શકો છો.
+        // હાલમાં ડેમો માટે યુઝરનેમ અને પાસવર્ડ બંને 'admin' રાખીએ છીએ.
+        if(user === "admin" && pass === "admin") {
+            window.location.href = "index.html"; 
+        } else {
+            document.getElementById("errorMsg").style.display = "block";
+        }
+    });
+</script>
+
+</body>
+</html>
