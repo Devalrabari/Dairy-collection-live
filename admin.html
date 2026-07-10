@@ -1,234 +1,239 @@
-<!DOCTYPE html>
-<html lang="gu">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>એડમિન પેનલ - ડેરી કલેક્શન સુધારો</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-        body { background-color: #f4f7f6; color: #333; padding: 20px; }
-        header { background-color: #d32f2f; color: white; text-align: center; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
-        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 950px; margin-left: auto; margin-right: auto; }
-        h2 { color: #d32f2f; margin-bottom: 15px; border-bottom: 2px solid #ff9f43; padding-bottom: 5px; }
-        .back-link { display: inline-block; margin-bottom: 15px; color: #1e3d59; font-weight: bold; text-decoration: none; background: #e8f4f8; padding: 8px 15px; border-radius: 4px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #d32f2f; color: white; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .btn-edit { background-color: #ff9f43; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; margin-right: 5px; }
-        .btn-delete { background-color: #ff4757; color: white; border: none; padding: 6px 12px; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        .btn-edit:hover { background-color: #ee5a24; }
-        .btn-delete:hover { background-color: #ff2a3a; }
+<!DOCTYPE html>  
+<html lang="gu">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>ડેરી સિસ્ટમ - એડમિન કંટ્રોલ</title>  
+    <style>  
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }  
+        body { background-color: #f4f7f6; color: #333; padding: 20px; }  
+        header { background-color: #d32f2f; color: white; text-align: center; padding: 15px; border-radius: 8px; margin-bottom: 20px; }  
+        .box { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; max-width: 1000px; margin-left: auto; margin-right: auto; }  
+        h2 { color: #1e3d59; margin-bottom: 15px; border-bottom: 2px solid #ffc107; padding-bottom: 5px; }  
         
-        /* મોડલ પોપઅપ સ્ટાઇલ */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
-        .modal-content { background-color: white; margin: 10% auto; padding: 20px; border-radius: 8px; width: 90%; max-width: 500px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-        .form-group { margin-bottom: 12px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-        .modal-buttons { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-save { background-color: #17b978; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 4px; font-weight: bold; }
-        .btn-cancel { background-color: #ccc; color: #333; border: none; padding: 10px; width: 100%; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        /* લોગીન સિક્યોરિટી */
+        #loginBox { max-width: 400px; margin: 100px auto; text-align: center; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 16px; margin-bottom: 10px; }  
+        button { background-color: #17b978; color: white; border: none; padding: 12px; font-size: 16px; border-radius: 4px; cursor: pointer; width: 100%; font-weight: bold; }  
+        button:hover { background-color: #139a63; }  
+        
+        /* ડેટા ટેબલ */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }  
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 15px; }  
+        th { background-color: #1e3d59; color: white; }  
+        tr:nth-child(even) { background-color: #f9f9f9; }  
+        
+        .btn-delete { background-color: #ff4757; color: white; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        .btn-delete:hover { background-color: #ff2a3a; }
+        .btn-edit { background-color: #ff9f43; color: white; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 5px; }
+        .btn-edit:hover { background-color: #ee5a24; }  
+        
+        .total-box { background-color: #e8f4f8; padding: 15px; border-radius: 4px; margin-top: 20px; font-weight: bold; border: 2px dashed #d32f2f; }
+        #adminContent { display: none; }
+        .nav-link { display: inline-block; margin-bottom: 15px; color: #1e3d59; font-weight: bold; text-decoration: none; }
     </style>
-</head>
+</head>  
 <body>
 
-    <div style="max-width: 950px; margin: 0 auto;">
-        <a href="index.html" class="back-link">⬅️ પાછા મુખ્ય પેજ પર જાઓ</a>
+    <div class="box" id="loginBox">
+        <h2>🔒 એડમિન કંટ્રોલ લોગીન</h2>
+        <p style="margin-bottom: 15px; color: #666; font-size: 14px;">ડેટા સુધારવા કે ડીલીટ કરવા પાસવર્ડ નાખો</p>
+        <input type="password" id="adminPass" placeholder="એડમિન પાસવર્ડ અહિયાં લખો...">
+        <button onclick="checkPassword()">પેનલ ઓપન કરો</button>
     </div>
 
-    <header>
-        <h1>⚙️ એડમિન મેનેજમેન્ટ પેનલ</h1>
-        <p>દૂધના રેકોર્ડ્સમાં ફેરફાર (Edit) અથવા ડીલીટ (Delete) કરો</p>
-    </header>
+    <div id="adminContent">
+        <header>  
+            <h1>⚙️ ડેરી દૂધ કલેક્શન - એડમિન એડિટ પેનલ</h1>  
+            <p>લાઈવ મોંગોડીબી (MongoDB Atlas) ડેટા મોડિફિકેશન સિસ્ટમ</p>  
+        </header>  
 
-    <div class="box">
-        <h2>📊 બધા ગ્રાહકોની દૂધ એન્ટ્રીઓ</h2>
-        <div style="overflow-x: auto;">
-            <table id="adminTable">
-                <thead>
-                    <tr>
-                        <th>તારીખ</th>
-                        <th>આઈડી</th>
-                        <th>નામ</th>
-                        <th>શિફ્ટ</th>
-                        <th>પ્રકાર</th>
-                        <th>લીટર</th>
-                        <th>ફેટ</th>
-                        <th>ભાવ</th>
-                        <th>કુલ રકમ</th>
-                        <th>એક્શન</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    </tbody>
-            </table>
-        </div>
-    </div>
+        <a href="index.html" class="nav-link">⬅️ મુખ્ય એન્ટ્રી પેજ પર પાછા જાઓ</a>
 
-    <div id="editModal" class="modal">
-        <div class="modal-content">
-            <h3>✏️ રેકોર્ડમાં સુધારો કરો</h3>
-            <hr style="margin: 10px 0;"><br>
-            <form id="editForm">
-                <input type="hidden" id="editIndex">
-                <div class="form-group">
-                    <label>ગ્રાહક નામ (ID):</label>
-                    <input type="text" id="editCustomerName" readonly style="background:#eee;">
-                </div>
-                <div class="form-group">
-                    <label>કુલ લીટર:</label>
-                    <input type="number" id="editLiters" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label>ફેટ (Fat):</label>
-                    <input type="number" id="editFat" step="0.1" required>
-                </div>
-                <div class="form-group">
-                    <label>ભાવ (પ્રતિ ફેટ):</label>
-                    <input type="number" id="editRate" step="0.01" required>
-                </div>
-                <div class="form-group">
-                    <label>કુલ રકમ (રૂપિયા):</label>
-                    <input type="text" id="editTotalAmt" readonly style="background:#eef9f5; font-weight:bold; color:green;">
-                </div>
-                <div class="modal-buttons">
-                    <button type="submit" class="btn-save">સેવ ચેન્જીસ</button>
-                    <button type="button" class="btn-cancel" onclick="closeModal()">કેન્સલ</button>
-                </div>
-            </form>
-        </div>
+        <div class="box">  
+            <h2>📊 લાઈવ કલેક્શન ડેટા મોડિફિકેશન લિસ્ટ</h2>  
+            <div style="overflow-x: auto;">  
+                <table id="adminTable">  
+                    <thead>  
+                        <tr>  
+                            <th>તારીખ</th>  
+                            <th>આઈડી</th>  
+                            <th>નામ</th>  
+                            <th>સમય (શિફ્ટ)</th>  
+                            <th>પ્રકાર</th>  
+                            <th>લીટર</th>  
+                            <th>ફેટ</th>  
+                            <th>ભાવ</th>  
+                            <th>કુલ રકમ</th>  
+                            <th>એક્શન (સુધારો/ડીલીટ)</th>  
+                        </tr>  
+                    </thead>  
+                    <tbody>  
+                        </tbody>  
+                </table>  
+            </div>  
+
+            <div class="total-box">  
+                <p style="font-size: 16px; margin-bottom: 5px;">📊 કુલ ફિલ્ટર દૂધ: <span id="finalLiters" style="color: #1e3d59;">0.00</span> લીટર</p>  
+                <p style="font-size: 18px; color: #d32f2f;">💰 કુલ સુધારેલી રકમ: ₹ <span id="finalCash">0.00</span></p>  
+            </div>  
+        </div>  
     </div>
 
     <script>
+        var globalCustomers = {};
         var milkRecords = [];
+        
+        const SECRET_PASSWORD = "admin@dairy123"; 
         const BACKEND_URL = "https://dairy-collection-live.onrender.com/api";
-        const DAIRY_ID = "dairy_deval";
+        const DAIRY_ID = "dairy_deval"; // ઇન્ડેક્સ પેજ સાથે મેચ થતું ડેરી આઈડી
 
-        // પેજ લોડ થાય ત્યારે ડેટા મેળવો
-        window.onload = function() {
-            loadAdminData();
-            
-            // લાઈવ કેલ્ક્યુલેશન એડિટ ફોર્મ માટે
-            ["editLiters", "editFat", "editRate"].forEach(id => {
-                document.getElementById(id).addEventListener("input", function() {
-                    var l = parseFloat(document.getElementById("editLiters").value) || 0;
-                    var f = parseFloat(document.getElementById("editFat").value) || 0;
-                    var r = parseFloat(document.getElementById("editRate").value) || 0;
-                    document.getElementById("editTotalAmt").value = (l * f * r).toFixed(2);
-                });
-            });
-        };
+        // લોગીન ચેક ફંક્શન
+        function checkPassword() {
+            var pass = document.getElementById("adminPass").value;
+            if(pass === SECRET_PASSWORD) {
+                document.getElementById("loginBox").style.display = "none";
+                document.getElementById("adminContent").style.display = "block";
+                loadAdminData();
+            } else {
+                alert("❌ ખોટો પાસવર્ડ! માત્ર ડેરીના માલિક જ ફેરફાર કરી શકે છે.");
+            }
+        }
 
+        // સર્વરમાંથી ફ્રેશ ડેટા લોડ કરવો
         function loadAdminData() {
             fetch(`${BACKEND_URL}/data`, {
                 headers: { 'dairy-id': DAIRY_ID }
-            })
-            .then(res => res.json())
-            .then(data => {
-                milkRecords = data.records || [];
-                renderTable();
-            })
-            .catch(err => alert("ડેટા લોડ કરવામાં ભૂલ: " + err.message));
+            })  
+                .then(res => {
+                    if (!res.ok) throw new Error("ડેટા લોડ ન થઈ શક્યો.");
+                    return res.json();
+                })  
+                .then(data => {  
+                    globalCustomers = data.customers || {};  
+                    milkRecords = data.records || [];  
+                    updateAdminTable(milkRecords);  
+                })  
+                .catch(err => alert("ભૂલ: " + err.message));
         }
 
-        function renderTable() {
-            var tbody = document.querySelector("#adminTable tbody");
-            tbody.innerHTML = "";
+        // ટેબલ જનરેટ કરવું
+        function updateAdminTable(dataArray) {
+            var tbody = document.querySelector("#adminTable tbody");  
+            tbody.innerHTML = "";   
+            var totalL = 0; var totalC = 0;  
+      
+            dataArray.forEach(function(record, index) {  
+                var tr = document.createElement("tr");  
+                tr.innerHTML = `  
+                    <td><strong>${record.date}</strong></td>  
+                    <td>${record.id}</td>  
+                    <td>${record.name}</td>  
+                    <td><strong style="color:${record.shift === 'સવાર' ? '#f39c12' : '#2980b9'}">${record.shift}</strong></td>  
+                    <td>${record.milkType}</td>  
+                    <td>${record.liters.toFixed(2)}</td>  
+                    <td>${record.fat.toFixed(1)}</td>  
+                    <td>${record.rate.toFixed(2)}</td>  
+                    <td style="font-weight:bold; color:green;">₹${record.totalAmt.toFixed(2)}</td>  
+                    <td>
+                        <button class="btn-edit" onclick="editRecord('${record._id}', ${index})">✏️ સુધારો</button>
+                        <button class="btn-delete" onclick="deleteRecord('${record._id}', ${index})">🗑️ ડીલીટ</button>
+                    </td>
+                `;  
+                tbody.appendChild(tr);  
+                totalL += record.liters;  
+                totalC += record.totalAmt;  
+            });  
+      
+            document.getElementById("finalLiters").innerText = totalL.toFixed(2);  
+            document.getElementById("finalCash").innerText = totalC.toFixed(2);  
+        }
 
-            if(milkRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; font-weight:bold; color:#666;">કોઈ એન્ટ્રી ઉપલબ્ધ નથી.</td></tr>`;
+        // 🗑️ ૧. મોંગોડીબીમાંથી કાયમી રેકોર્ડ ડીલીટ કરવાનું ફંક્શન
+        function deleteRecord(mongoId, index) {
+            if(!mongoId || mongoId === "undefined") {
+                alert("ભૂલ: આ રેકોર્ડની મોંગોડીબી આઈડી મળી નથી.");
                 return;
             }
 
-            milkRecords.forEach((record, index) => {
-                var tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${record.date}</td>
-                    <td>${record.id}</td>
-                    <td>${record.name}</td>
-                    <td>${record.shift}</td>
-                    <td>${record.milkType}</td>
-                    <td>${record.liters.toFixed(2)}</td>
-                    <td>${record.fat.toFixed(1)}</td>
-                    <td>${record.rate.toFixed(2)}</td>
-                    <td style="font-weight:bold; color:green;">₹${record.totalAmt.toFixed(2)}</td>
-                    <td>
-                        <button class="btn-edit" onclick="openEditModal(${index})">સુધારો</button>
-                        <button class="btn-delete" onclick="deleteRecord(${index})">ડીલીટ</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        // એડિટ પોપઅપ ખોલો
-        function openEditModal(index) {
-            var record = milkRecords[index];
-            document.getElementById("editIndex").value = index;
-            document.getElementById("editCustomerName").value = `${record.id} - ${record.name}`;
-            document.getElementById("editLiters").value = record.liters;
-            document.getElementById("editFat").value = record.fat;
-            document.getElementById("editRate").value = record.rate;
-            document.getElementById("editTotalAmt").value = record.totalAmt.toFixed(2);
-            document.getElementById("editModal").style.display = "block";
-        }
-
-        function closeModal() {
-            document.getElementById("editModal").style.display = "none";
-        }
-
-        // સુધારેલો ડેટા સેવ કરો
-        document.getElementById("editForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-            var index = document.getElementById("editIndex").value;
-            
-            // ઓરિજિનલ રેકોર્ડની નકલ બનાવી ફેરફાર કરો
-            var updatedRecord = { ...milkRecords[index] };
-            updatedRecord.liters = parseFloat(document.getElementById("editLiters").value) || 0;
-            updatedRecord.fat = parseFloat(document.getElementById("editFat").value) || 0;
-            updatedRecord.rate = parseFloat(document.getElementById("editRate").value) || 0;
-            updatedRecord.totalAmt = parseFloat(document.getElementById("editTotalAmt").value) || 0;
-
-            // મોકલેલ ઇન્ડેક્સ પ્રમાણે બેકએન્ડમાં અપડેટ મોકલો
-            fetch(`${BACKEND_URL}/records/${index}`, {
-                method: 'PUT',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'dairy-id': DAIRY_ID
-                },
-                body: JSON.stringify(updatedRecord)
-            })
-            .then(res => {
-                if(!res.ok) throw new Error("સર્વર પર ડેટા અપડેટ ન થયો.");
-                return res.json();
-            })
-            .then(data => {
-                alert("✓ એન્ટ્રી સફળતાપૂર્વક સુધારી લેવામાં આવી છે.");
-                milkRecords = data.records;
-                renderTable();
-                closeModal();
-            })
-            .catch(err => alert("એરર: " + err.message));
-        });
-
-        // રેકોર્ડ ડીલીટ કરો
-        function deleteRecord(index) {
-            if(confirm("શું તમે ખરેખર આ એન્ટ્રી ડિલીટ કરવા માંગો છો?")) {
-                fetch(`${BACKEND_URL}/records/${index}`, {
+            if(confirm("શું તમે આ એન્ટ્રી ડેટાબેઝમાંથી હંમેશ માટે ડીલીટ કરવા માંગો છો?")) {
+                fetch(`${BACKEND_URL}/records/${mongoId}`, {
                     method: 'DELETE',
                     headers: { 'dairy-id': DAIRY_ID }
                 })
                 .then(res => {
-                    if(!res.ok) throw new Error("સર્વર પરથી એન્ટ્રી ડિલીટ ન થઈ શકી.");
+                    if (!res.ok) throw new Error("સર્વર પરથી એન્ટ્રી ડીલીટ ના થઈ શકી.");
                     return res.json();
                 })
                 .then(data => {
-                    alert("🗑️ એન્ટ્રી સફળતાપૂર્વક ડિલીટ થઈ ગઈ છે.");
-                    milkRecords = data.records;
-                    renderTable();
+                    alert("🗑️ એન્ટ્રી કાયમી ધોરણે ડીલીટ થઈ ગઈ છે!");
+                    milkRecords = data.records || [];
+                    updateAdminTable(milkRecords); 
                 })
-                .catch(err => alert("એરર: " + err.message));
+                .catch(err => {
+                    alert("ભૂલ આવી: " + err.message);
+                });
+            }
+        }
+
+        // ✏️ ૨. ડેટા લાઈવ સુધારીને અપડેટ (PUT) કરવાનું ફંક્શન
+        function editRecord(mongoId, index) {
+            if(!mongoId || mongoId === "undefined") {
+                alert("ભૂલ: આ રેકોર્ડની મોંગોડીબી આઈડી મળી નથી.");
+                return;
+            }
+
+            var record = milkRecords[index];
+
+            var newDateRaw = prompt("નવી તારીખ લખો (YYYY-MM-DD ફોર્મેટમાં):", record.rawDate || "");
+            var newShift = prompt("નવો સમય લખો (સવાર અથવા સાંજ):", record.shift);
+            var newLiters = prompt("નવા લીટર લખો:", record.liters);
+            var newFat = prompt("નવા ફેટ લખો:", record.fat);
+            var newRate = prompt("નવો ભાવ (પ્રતિ ફેટ) લખો:", record.rate);
+
+            if(newDateRaw != null && newShift != null && newLiters != null && newFat != null && newRate != null) {
+                
+                var displayDate = record.date;
+                if(newDateRaw.includes("-")) {
+                    var parts = newDateRaw.split("-");
+                    if(parts.length === 3) displayDate = parts[2] + "-" + parts[1] + "-" + parts[0];
+                }
+
+                var l = parseFloat(newLiters) || 0;
+                var f = parseFloat(newFat) || 0;
+                var r = parseFloat(newRate) || 0;
+                var total = l * f * r; 
+
+                var updatedBody = {
+                    rawDate: newDateRaw,
+                    date: displayDate,
+                    shift: newShift,
+                    liters: l,
+                    fat: f,
+                    rate: r,
+                    totalAmt: total
+                };
+
+                fetch(`${BACKEND_URL}/records/${mongoId}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'dairy-id': DAIRY_ID
+                    },
+                    body: JSON.stringify(updatedBody)
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("સર્વર પર ડેટા અપડેટ ન થઈ શક્યો.");
+                    return res.json();
+                })
+                .then(data => {
+                    alert("✏️ એન્ટ્રી સફળતાપૂર્વક અપડેટ થઈ ગઈ!");
+                    milkRecords = data.records || [];
+                    updateAdminTable(milkRecords); 
+                })
+                .catch(err => {
+                    alert("અપડેટ નિષ્ફળ: " + err.message);
+                });
             }
         }
     </script>
