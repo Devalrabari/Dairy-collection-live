@@ -26,7 +26,7 @@
         .btn-delete { background-color: #ff4757; color: white; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         .btn-delete:hover { background-color: #ff2a3a; }
         .btn-edit { background-color: #ff9f43; color: white; padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-right: 5px; }
-        .btn-edit:hover { background-color: #ee5a24; }
+        .btn-edit:hover { background-color: #ee5a24; }  
         
         .total-box { background-color: #e8f4f8; padding: 15px; border-radius: 4px; margin-top: 20px; font-weight: bold; border: 2px dashed #d32f2f; }
         #adminContent { display: none; }
@@ -35,7 +35,6 @@
 </head>  
 <body>
 
-    <!-- ૧. સુરક્ષા લોગીન લોક -->
     <div class="box" id="loginBox">
         <h2>🔒 એડમિન કંટ્રોલ લોગીન</h2>
         <p style="margin-bottom: 15px; color: #666; font-size: 14px;">ડેટા સુધારવા કે ડીલીટ કરવા પાસવર્ડ નાખો</p>
@@ -43,7 +42,6 @@
         <button onclick="checkPassword()">પેનલ ઓપન કરો</button>
     </div>
 
-    <!-- ૨. મુખ્ય એડમિન ડેશબોર્ડ -->
     <div id="adminContent">
         <header>  
             <h1>⚙️ ડેરી દૂધ કલેક્શન - એડમિન એડિટ પેનલ</h1>  
@@ -71,8 +69,7 @@
                         </tr>  
                     </thead>  
                     <tbody>  
-                        <!-- ડેટા ક્લાઉડમાંથી લોડ થશે -->  
-                    </tbody>  
+                        </tbody>  
                 </table>  
             </div>  
 
@@ -87,9 +84,9 @@
         var globalCustomers = {};
         var milkRecords = [];
         
-        // તમે તમારી ઈચ્છા મુજબનો સિક્રેટ પાસવર્ડ અહિયાં સેટ કરી શકો છો
         const SECRET_PASSWORD = "admin@dairy123"; 
         const BACKEND_URL = "https://dairy-collection-live.onrender.com/api";
+        const DAIRY_ID = "dairy_deval"; // ઇન્ડેક્સ પેજ સાથે મેચ થતું ડેરી આઈડી
 
         // લોગીન ચેક ફંક્શન
         function checkPassword() {
@@ -105,7 +102,9 @@
 
         // સર્વરમાંથી ફ્રેશ ડેટા લોડ કરવો
         function loadAdminData() {
-            fetch(`${BACKEND_URL}/data`)  
+            fetch(`${BACKEND_URL}/data`, {
+                headers: { 'dairy-id': DAIRY_ID }
+            })  
                 .then(res => {
                     if (!res.ok) throw new Error("ડેટા લોડ ન થઈ શક્યો.");
                     return res.json();
@@ -117,51 +116,6 @@
                 })  
                 .catch(err => alert("ભૂલ: " + err.message));
         }
-        // કસ્ટમર લિસ્ટ માટે ડિલીટ ફંક્શન
-function deleteCustomer(customerId) {
-    if (confirm("શું તમે આ કસ્ટમરને ડિલીટ કરવા માંગੋ છો?")) {
-        fetch(`${BACKEND_URL}/api/customers/${customerId}`, {
-            method: 'DELETE'
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("કસ્ટમર ડિલીટ થઈ શક્યો નથી.");
-            return res.json();
-        })
-        .then(data => {
-            alert(data.message);
-            // અહીં પેજને રિફ્રेश કરો અથવા લિસ્ટને અપડેટ કરો
-        })
-        .catch(err => {
-            alert("ભૂલ: " + err.message);
-        });
-    }
-}
-
-// કસ્ટમર લિસ્ટ માટે એડિટ ફંક્શન
-function editCustomer(customerId, currentName) {
-    const newName = prompt("કૃપા કરીને નવું નામ દાખલ કરો:", currentName);
-    if (newName) {
-        fetch(`${BACKEND_URL}/api/customers/${customerId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name: newName })
-        })
-        .then(res => {
-            if (!res.ok) throw new Error("નામ અપડેટ થઈ શક્યું નથી.");
-            return res.json();
-        })
-        .then(data => {
-            alert(data.message);
-            // અહીં પેજને રિફ્રेश કરો અથવા લિસ્ટને અપડેટ કરો
-        })
-        .catch(err => {
-            alert("ભૂલ: " + err.message);
-        });
-    }
-                }
-        
 
         // ટેબલ જનરેટ કરવું
         function updateAdminTable(dataArray) {
@@ -195,7 +149,7 @@ function editCustomer(customerId, currentName) {
             document.getElementById("finalCash").innerText = totalC.toFixed(2);  
         }
 
-        // 🗑️ ૧. મોંગોડીબીમાંથી કાયમી ડીલીટ કરવાનું ફંક્શન
+        // 🗑️ ૧. મોંગોડીબીમાંથી કાયમી રેકોર્ડ ડીલીટ કરવાનું ફંક્શન
         function deleteRecord(mongoId, index) {
             if(!mongoId || mongoId === "undefined") {
                 alert("ભૂલ: આ રેકોર્ડની મોંગોડીબી આઈડી મળી નથી.");
@@ -204,7 +158,8 @@ function editCustomer(customerId, currentName) {
 
             if(confirm("શું તમે આ એન્ટ્રી ડેટાબેઝમાંથી હંમેશ માટે ડીલીટ કરવા માંગો છો?")) {
                 fetch(`${BACKEND_URL}/records/${mongoId}`, {
-                    method: 'DELETE'
+                    method: 'DELETE',
+                    headers: { 'dairy-id': DAIRY_ID }
                 })
                 .then(res => {
                     if (!res.ok) throw new Error("સર્વર પરથી એન્ટ્રી ડીલીટ ના થઈ શકી.");
@@ -213,7 +168,7 @@ function editCustomer(customerId, currentName) {
                 .then(data => {
                     alert("🗑️ એન્ટ્રી કાયમી ધોરણે ડીલીટ થઈ ગઈ છે!");
                     milkRecords = data.records || [];
-                    updateAdminTable(milkRecords); // ટેબલ રીફ્રેશ કરો
+                    updateAdminTable(milkRecords); 
                 })
                 .catch(err => {
                     alert("ભૂલ આવી: " + err.message);
@@ -230,17 +185,14 @@ function editCustomer(customerId, currentName) {
 
             var record = milkRecords[index];
 
-            // પ્રોમ્પ બોક્સ દ્વારા નવો ડેટા લેવો
             var newDateRaw = prompt("નવી તારીખ લખો (YYYY-MM-DD ફોર્મેટમાં):", record.rawDate || "");
             var newShift = prompt("નવો સમય લખો (સવાર અથવા સાંજ):", record.shift);
             var newLiters = prompt("નવા લીટર લખો:", record.liters);
             var newFat = prompt("નવા ફેટ લખો:", record.fat);
             var newRate = prompt("નવો ભાવ (પ્રતિ ફેટ) લખો:", record.rate);
 
-            // જો યુઝરે કન્સલ ન કર્યું હોય તો જ આગળ વધવું
             if(newDateRaw != null && newShift != null && newLiters != null && newFat != null && newRate != null) {
                 
-                // તારીખ ફોર્મેટ બરાબર કરવું (DD-MM-YYYY)
                 var displayDate = record.date;
                 if(newDateRaw.includes("-")) {
                     var parts = newDateRaw.split("-");
@@ -250,7 +202,7 @@ function editCustomer(customerId, currentName) {
                 var l = parseFloat(newLiters) || 0;
                 var f = parseFloat(newFat) || 0;
                 var r = parseFloat(newRate) || 0;
-                var total = l * f * r; // નવું ટોટલ કેલ્ક્યુલેશન
+                var total = l * f * r; 
 
                 var updatedBody = {
                     rawDate: newDateRaw,
@@ -262,10 +214,12 @@ function editCustomer(customerId, currentName) {
                     totalAmt: total
                 };
 
-                // બેકએન્ડ PUT API પર અપડેટ મોકલવું
                 fetch(`${BACKEND_URL}/records/${mongoId}`, {
                     method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'dairy-id': DAIRY_ID
+                    },
                     body: JSON.stringify(updatedBody)
                 })
                 .then(res => {
@@ -275,7 +229,7 @@ function editCustomer(customerId, currentName) {
                 .then(data => {
                     alert("✏️ એન્ટ્રી સફળતાપૂર્વક અપડેટ થઈ ગઈ!");
                     milkRecords = data.records || [];
-                    updateAdminTable(milkRecords); // લાઈવ રીફ્રેશ
+                    updateAdminTable(milkRecords); 
                 })
                 .catch(err => {
                     alert("અપડેટ નિષ્ફળ: " + err.message);
